@@ -5,6 +5,12 @@ import (
 	"github.com/anindyaSeng/microservices/mvc/util"
 )
 
-func GetUser(userId int64) (*domain.User, *util.AppError) {
-	return domain.GetUser(userId)
+// InitUserService ...
+func InitUserService() {
+	domain.InitUserDomain()
+}
+
+// GetUser ...
+func GetUser(userID int64) (*domain.User, *util.AppError) {
+	return domain.GetUser(userID)
 }

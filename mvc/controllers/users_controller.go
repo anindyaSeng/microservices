@@ -9,6 +9,11 @@ import (
 	"github.com/anindyaSeng/microservices/mvc/util"
 )
 
+// InitUserController ...
+func InitUserController() {
+	services.InitUserService()
+}
+
 // GetUser ...
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	userParam := r.URL.Query().Get("user_id")

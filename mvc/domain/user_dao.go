@@ -3,24 +3,39 @@ package domain
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/anindyaSeng/microservices/mvc/util"
 )
 
-var Users = map[int64]*User{
-	123: {UserId: 123, FirstName: "Ab", LastName: "Cd", Email: "myemail@gmail.com"},
-	456: {UserId: 456, FirstName: "Ef", LastName: "Gh", Email: "myemail.too@gmail.com"},
+var updater *myUpdater = nil
+
+// InitUserDomain ...
+func InitUserDomain() {
+
+	if updater == nil {
+
+		updater = &myUpdater{
+			Ticker:  time.NewTicker(time.Second * 1),
+			GetData: make(chan int64),
+		}
+		go updater.run()
+	}
 }
 
-func GetUser(userId int64) (*User, *util.AppError) {
+// GetUser ...
+func GetUser(userID int64) (*User, *util.AppError) {
 
-	if user := Users[userId]; user != nil {
-		println("User found....")
+	user = nil
+	updater.GetData <- userID // sending the uid to channel to find out if user is present
+	<-updater.GetData         // wait till read completes
+
+	if user != nil { // user found
 		return user, nil
 	}
 
-	return nil, &util.AppError{
-		Message:    fmt.Sprintf("User %v was not found", userId),
+	return nil, &util.AppError{ //user not found
+		Message:    fmt.Sprintf("User %v was not found", userID),
 		StatusCode: http.StatusNotFound,
 		Code:       "not_found",
 	}
